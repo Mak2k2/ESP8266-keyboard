@@ -4,4 +4,4 @@ ATmega16u2 must be flashed with firmware "arduino-keyboard-0.3.tar.gz".
 It should connect the port GPIO2 esp8266 to port 8(rx) ATmega16u2.
 Transfer keys should be through telnet on port 23.
 The approximate scheme:
-![telnet_keyboard](https://user-images.githubusercontent.com/31064571/29454878-8f7dada2-8417-11e7-94ff-36ea49084db2.JPG)
+![telnet_keyboard](https://user-images.githubusercontent.com/31064571/31136614-82b2cde0-a871-11e7-9fef-aa1150465144.JPG)
