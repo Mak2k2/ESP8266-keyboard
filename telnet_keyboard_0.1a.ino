@@ -22,13 +22,6 @@ int modeswitch = 0;
 #define Port4 4
 #define Port5 5
 
-//цвет кнопок
-String ColorB1;
-String ColorB2;
-String ColorB3;
-String ColorB4;
-String ColorB5;
-
 ESP8266WebServer server(80);
 
 WiFiClient serverClients[MAX_SRV_CLIENTS];
@@ -62,10 +55,10 @@ void handleLogin(){
       ESP.reset();
       return;
     }
-  msg = "Wrong ssid/password! try again.";
-  Serial.println("Login Failed");
+    msg = "Wrong ssid/password! try again.";
+    Serial.println("Login Failed");
   }
- String content = "<html><body><form action='/' method='POST'>Enter the access point name and password <br>";//страница ввода SSID и пароля
+  String content = "<html><body><form action='/' method='POST'>Enter the access point name and password <br>";//страница ввода SSID и пароля
   content += "Name AP:<input type='text' name='SSID' placeholder='SSID'><br>";
   content += "Password:<input type='password' name='PASSAP' placeholder='password'><br><br>";
   content += "<input type='submit' name='SUBMIT' value='Connect to WI-FI'></form><b><font color='red'>" + msg + "</font></b><br>";
@@ -142,7 +135,6 @@ void setup(void){
   if (modeswitch == 1){
     Serial.println("");
     Serial.println("WiFi switch AP mode");
-    //WiFi.mode(WIFI_AP_STA);Это для режима клиент + точка доступа. Закоментил потому что притормаживало
     WiFi.mode(WIFI_AP);
     WiFi.softAP("TD", "testtest");
     Serial.print("AP mode ip adress ");
@@ -170,8 +162,8 @@ void setup(void){
     server.on("/", handleLogin);//Страница ввода логина(SSID) и пароля
     //Обновление прошивки
     server.on("/upload", HTTP_GET, [](){
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", serverIndex);
+      server.sendHeader("Connection", "close");
+      server.send(200, "text/html", serverIndex);
     });
     server.on("/update", HTTP_POST, [](){
       server.sendHeader("Connection", "close");
@@ -180,7 +172,7 @@ void setup(void){
       if (uperror == 0) server.send(200, "text/html", "Firmware update successfully <a href='/'>BACK</a>");
       else server.send(200, "text/html", "Update error <a href='/'>BACK</a>");
       ESP.restart();
-  },[](){
+    },[](){
         HTTPUpload& upload = server.upload();
         if(upload.status == UPLOAD_FILE_START){
           Serial.setDebugOutput(true);
@@ -197,7 +189,7 @@ void setup(void){
           }
         } else if(upload.status == UPLOAD_FILE_WRITE){
             if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
-            Update.printError(Serial);
+              Update.printError(Serial);
             }
           } else if(upload.status == UPLOAD_FILE_END){
             if(Update.end(true)){ //true to set the size to the current progress
@@ -207,8 +199,8 @@ void setup(void){
               }
               Serial.setDebugOutput(false);
             }
-      yield();
-        });
+        yield();
+      });
   //Управление портами      
   server.on("/PoRt1", [] {
     controlPin(Port1);
@@ -259,20 +251,20 @@ void loop(void){
   server.begin();
   keyboard.begin();
   while(WiFi.status() == WL_CONNECTED) {
-  if (server.hasClient()){
-    for(i = 0; i < MAX_SRV_CLIENTS; i++){
-      //find free/disconnected spot
-      if (!serverClients[i] || !serverClients[i].connected()){
-        if(serverClients[i]) serverClients[i].stop();
-        serverClients[i] = server.available();
-        Serial.println("New client: "); Serial.print(i);
-        continue;
+    if (server.hasClient()){
+      for(i = 0; i < MAX_SRV_CLIENTS; i++){
+        //find free/disconnected spot
+        if (!serverClients[i] || !serverClients[i].connected()){
+          if(serverClients[i]) serverClients[i].stop();
+          serverClients[i] = server.available();
+          Serial.println("New client: "); Serial.print(i);
+          continue;
+        }
       }
+      //no free/disconnected spot so reject
+      WiFiClient serverClient = server.available();
+      serverClient.stop();
     }
-    //no free/disconnected spot so reject
-    WiFiClient serverClient = server.available();
-    serverClient.stop();
-  }
   //check clients for data
   for(i = 0; i < MAX_SRV_CLIENTS; i++){
     if (serverClients[i] && serverClients[i].connected()){
@@ -324,15 +316,14 @@ void loop(void){
             case 18: controlPin(Port4); break;//Ctrl+r
             case 20: controlPin(Port5); break;//Ctrl+t
             
-            default:  keyboard.pressKey(key); break;//нажать клавишу
-            
+            default:  keyboard.pressKey(key); break;//нажать клавишу   
           }
-        keyboard.releaseKey();//отпустить клавишу 
-        Serial.print(" string: ");
-        Serial.print(key);//для отладки
-        Serial.print(" KEY: ");
-        Serial.write(bufkey.toInt());
-        bufkey = '0';//на всякий случай обнулить
+          keyboard.releaseKey();//отпустить клавишу 
+          Serial.print(" string: ");
+          Serial.print(key);//для отладки
+          Serial.print(" KEY: ");
+          Serial.write(bufkey.toInt());
+          bufkey = '0';//на всякий случай обнулить
        }
      }
    }
@@ -350,5 +341,5 @@ void loop(void){
       }
     }
   }
-  }
+ }
 }
